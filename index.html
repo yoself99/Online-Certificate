@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสร้างเกียรติบัตรออนไลน์</title>
+    <style>
+        body {
+            font-family: 'TH Sarabun New', 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .control-panel {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], input[type="number"], textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .certificate-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .certificate {
+            position: relative;
+            padding: 40px;
+            box-sizing: border-box;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+            background-color: #fff9e6; /* Default background color */
+            border: 1px dashed #ccc;
+            overflow: hidden; /* Ensure content doesn't overflow */
+        }
+        
+        .certificate-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .certificate-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative; /* Added for logo positioning */
+            width: 100%; /* Ensure it takes full width to center content */
+        }
+        
+        .logo-image {
+            object-fit: contain; /* Ensures image scales down without distorting */
+            margin-bottom: 15px; /* Spacing between logo and title */
+            position: absolute; /* Allows precise positioning */
+            top: 0;
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for true center */
+        }
+        
+        .certificate-title {
+            font-weight: bold;
+            color: #8b5a2b;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            word-wrap: break-word; /* Allow long words to break */
+            margin-top: 0; /* Will be adjusted by logo's margin-bottom + dynamic spacing */
+        }
+        
+        .certificate-text-line {
+            margin: 5px 0; /* Adjusted margin for multiple lines */
+            line-height: 1.4;
+            max-width: 90%; 
+            word-wrap: break-word; 
+        }
+        
+        .recipient-name {
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 30px 0;
+            padding: 10px 30px;
+            border-bottom: 2px solid #e0c56e;
+            display: inline-block;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            word-wrap: break-word; 
+        }
+        
+        .signature-area {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 50px;
+        }
+        
+        .signature {
+            text-align: center;
+        }
+        
+        .signature-image {
+            max-width: 200px;
+            max-height: 100px;
+            margin-bottom: 10px;
+            object-fit: contain;
+        }
+        
+        .signature-line {
+            width: 200px;
+            border-top: 1px solid #333;
+            margin: 5px auto;
+        }
+        
+        .download-btn {
+            background-color: #27ae60;
+            margin-top: 10px;
+        }
+        
+        .download-btn:hover {
+            background-color: #219653;
+        }
+        
+        .upload-area {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            position: relative; 
+            min-height: 100px; 
+            display: flex; /* Use flex to center content */
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .upload-area:hover {
+            border-color: #3498db;
+            background-color: #f0f8ff;
+        }
+        
+        .preview-image {
+            max-width: 100%; /* Ensure it fits in preview area */
+            max-height: 150px;
+            margin-top: 10px;
+            display: none;
+            object-fit: contain;
+        }
+
+        /* Styling for logoPreview in the control panel */
+        #logoPreview {
+            position: static; /* Reset to static for display in control panel */
+            cursor: default; /* Reset cursor */
+            transform: none; /* Reset transform */
+            margin-bottom: 10px; /* Add margin for spacing in preview */
+            max-width: 150px; /* Default max-width for preview */
+            max-height: 80px; /* Default max-height for preview */
+        }
+        
+        .size-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .size-controls select {
+            flex: 1;
+        }
+        
+        .orientation-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .orientation-btn {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #f8f9fa;
+        }
+        
+        .orientation-btn.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .font-controls, .logo-size-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .font-controls select, .font-controls input,
+        .logo-size-controls input {
+            flex: 1;
+        }
+        
+        .clear-signature {
+            background-color: #e74c3c;
+            margin-top: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        /* Modified no-background to only affect image, not color */
+        .no-background {
+            background-image: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ระบบสร้างเกียรติบัตรออนไลน์</h1>
+        
+        <div class="control-panel">
+            <div class="form-group">
+                <label for="certTitle">หัวข้อเกียรติบัตร</label>
+                <input type="text" id="certTitle" value="เกียรติบัตร">
+            </div>
+            
+            <div class="form-group">
+                <label>โลโก้องค์กร</label>
+                <div class="upload-area" id="logoUploadArea">
+                    <div>คลิกเพื่ออัพโหลดโลโก้</div>
+                    <input type="file" id="logoUpload" accept="image/*" style="display: none;">
+                    <img id="logoPreview" class="preview-image">
+                </div>
+                <div class="logo-size-controls">
+                    <div>
+                        <label for="logoWidth">ความกว้างโลโก้ (px)</label>
+                        <input type="number" id="logoWidth" value="150" min="10" max="500">
+                    </div>
+                    <div>
+                        <label for="logoHeight">ความสูงโลโก้ (px)</label>
+                        <input type="number" id="logoHeight" value="80" min="10" max="500">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="certTextLine1">ข้อความเกียรติบัตร บรรทัดที่ 1</label>
+                <textarea id="certTextLine1" rows="1">ด้วยความยินดีอย่างยิ่ง</textarea>
+            </div>
+            <div class="form-group">
+                <label for="certTextLine2">ข้อความเกียรติบัตร บรรทัดที่ 2</label>
+                <textarea id="certTextLine2" rows="1">มอบเกียรติบัตรนี้เพื่อเชิดชูเกียรติและประกาศคุณงามความดีของ</textarea>
+            </div>
+            <div class="form-group">
+                <label for="certTextLine3">ข้อความเกียรติบัตร บรรทัดที่ 3</label>
+                <textarea id="certTextLine3" rows="1">ผู้ซึ่งได้ปฏิบัติหน้าที่ด้วยความวิริยะอุตสาหะเป็นอย่างยิ่ง</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="recipientNames">รายชื่อผู้รับ (ใส่ทีละชื่อ)</label>
+                <textarea id="recipientNames" rows="4" placeholder="ป้อนชื่อผู้รับทีละชื่อ"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="signerName">ชื่อผู้ลงนาม</label>
+                <input type="text" id="signerName" value="ผู้บริหารองค์กร">
+            </div>
+            
+            <div class="form-group">
+                <label for="signerTitle">ตำแหน่งผู้ลงนาม</label>
+                <input type="text" id="signerTitle" value="ผู้อำนวยการ">
+            </div>
+            
+            <div class="form-group">
+                <label>ลายเซ็นผู้ลงนาม</label>
+                <div class="upload-area" id="signatureUploadArea">
+                    <div>คลิกเพื่ออัพโหลดลายเซ็น (หรือวาดในช่องด้านล่าง)</div>
+                    <input type="file" id="signatureUpload" accept="image/*" style="display: none;">
+                    <img id="signaturePreview" class="preview-image">
+                </div>
+                <canvas id="signaturePad" width="300" height="150" style="border: 1px solid #ddd; margin-top: 10px; cursor: crosshair;"></canvas>
+                <button id="clearSignature" class="clear-signature">ลบล้างลายเซ็น</button>
+            </div>
+            
+            <div class="form-group">
+                <label>พื้นหลังเกียรติบัตร</label>
+                <div class="upload-area" id="bgUploadArea">
+                    <div>คลิกเพื่ออัพโหลดพื้นหลัง (เว้นว่างหากต้องการพิมพ์บนกระดาษเปล่า)</div>
+                    <input type="file" id="bgUpload" accept="image/*" style="display: none;">
+                    <img id="bgPreview" class="preview-image">
+                </div>
+                <label style="margin-top: 10px;">
+                    <input type="checkbox" id="transparentBg"> แสดงพื้นหลังเป็นแผ่นใส (สำหรับพิมพ์บนกระดาษสำเร็จรูป)
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label>ขนาดกระดาษ</label>
+                <select id="paperSize" class="form-control">
+                    <option value="a4">A4 (210 x 297 มม.)</option>
+                    <option value="a5">A5 (148 x 210 มม.)</option>
+                    <option value="a6">A6 (105 x 148 มม.)</option>
+                    <option value="a7">A7 (74 x 105 มม.)</option>
+                    <option value="a8">A8 (52 x 74 มม.)</option>
+                    <option value="a9">A9 (37 x 52 มม.)</option>
+                    <option value="a10">A10 (26 x 37 มม.)</option>
+                    <option value="b4">B4 (250 x 353 มม.)</option>
+                    <option value="b5">B5 (176 x 250 มม.)</option>
+                    <option value="b6">B6 (125 x 176 มม.)</option>
+                    <option value="b7">B7 (88 x 125 มม.)</option>
+                    <option value="b8">B8 (62 x 88 มม.)</option>
+                    <option value="b9">B9 (44 x 62 มม.)</option>
+                    <option value="b10">B10 (31 x 44 มม.)</option>
+                    <option value="c3">C3 (324 x 458 มม.)</option>
+                    <option value="c4">C4 (229 x 324 มม.)</option>
+                    <option value="c5">C5 (162 x 229 มม.)</option>
+                    <option value="c6">C6 (114 x 162 มม.)</option>
+                    <option value="c7">C7 (81 x 114 มม.)</option>
+                    <option value="c8">C8 (57 x 81 มม.)</option>
+                    <option value="c9">C9 (40 x 57 มม.)</option>
+                    <option value="c10">C10 (28 x 40 มม.)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>แนวกระดาษ</label>
+                <div class="orientation-controls">
+                    <div class="orientation-btn active" id="portraitBtn">แนวตั้ง</div>
+                    <div class="orientation-btn" id="landscapeBtn">แนวนอน</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>ระยะขอบ (มม.)</label>
+                <input type="number" id="certMargin" value="20" min="0" max="100">
+            </div>
+            
+            <div class="form-group">
+                <label>ปรับแต่งฟอนต์</label>
+                <div class="font-controls">
+                    <select id="fontFamily">
+                        <option value="'TH Sarabun New', 'Sarabun', sans-serif">TH Sarabun New</option>
+                        <option value="'Kanit', sans-serif">Kanit</option>
+                        <option value="'Prompt', sans-serif">Prompt</option>
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                    </select>
+                    <select id="fontColor">
+                        <option value="#2c3e50">สีดำ</option>
+                        <option value="#8b5a2b">สีน้ำตาล</option>
+                        <option value="#2c3e50">สีน้ำเงินเข้ม</option>
+                        <option value="#c0392b">สีแดง</option>
+                        <option value="#16a085">สีเขียว</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button id="generateBtn">สร้างเกียรติบัตร</button>
+            <button id="downloadAllBtn" class="download-btn">ดาวน์โหลดทั้งหมด</button>
+            <button id="clearBtn" style="background-color: #e74c3c;">ล้างทั้งหมด</button>
+        </div>
+        
+        <div class="certificate-container" id="certificateContainer">
+            </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ตัวแปรเก็บข้อมูล
+            let customBackground = null;
+            let customLogo = null;
+            let signatureImage = null;
+            let isDrawing = false;
+            let isLandscape = false;
+            
+            // ขนาดกระดาษมาตรฐาน (กว้าง x สูง ในหน่วยมิลลิเมตร)
+            const paperSizes = {
+                a4: { width: 210, height: 297 },
+                a5: { width: 148, height: 210 },
+                a6: { width: 105, height: 148 },
+                a7: { width: 74, height: 105 },
+                a8: { width: 52, height: 74 },
+                a9: { width: 37, height: 52 },
+                a10: { width: 26, height: 37 },
+                b4: { width: 250, height: 353 },
+                b5: { width: 176, height: 250 },
+                b6: { width: 125, height: 176 },
+                b7: { width: 88, height: 125 },
+                b8: { width: 62, height: 88 },
+                b9: { width: 44, height: 62 },
+                b10: { width: 31, height: 44 },
+                c3: { width: 324, height: 458 },
+                c4: { width: 229, height: 324 },
+                c5: { width: 162, height: 229 },
+                c6: { width: 114, height: 162 },
+                c7: { width: 81, height: 114 },
+                c8: { width: 57, height: 81 },
+                c9: { width: 40, height: 57 },
+                c10: { width: 28, height: 40 }
+            };
+            
+            // ตั้งค่า Signature Pad
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            
+            // เริ่มวาดลายเซ็น
+            canvas.addEventListener('mousedown', (e) => {
+                isDrawing = true;
+                ctx.beginPath();
+                ctx.moveTo(e.offsetX, e.offsetY);
+            });
+            
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDrawing) {
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                }
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+                updateSignaturePreview();
+            });
+            
+            canvas.addEventListener('mouseout', () => {
+                isDrawing = false;
+            });
+            
+            // สำหรับ Touch devices
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup', {});
+                canvas.dispatchEvent(mouseEvent);
+            });
+            
+            // ลบล้างลายเซ็น
+            document.getElementById('clearSignature').addEventListener('click', function() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                signatureImage = null;
+                document.getElementById('signaturePreview').style.display = 'none';
+            });
+            
+            // อัพโหลดโลโก้
+            const logoUpload = document.getElementById('logoUpload');
+            const logoPreview = document.getElementById('logoPreview');
+            const logoUploadArea = document.getElementById('logoUploadArea'); 
+            
+            // Modified to always trigger file input when clicking the upload area
+            logoUploadArea.addEventListener('click', function(e) {
+                 logoUpload.click();
+            });
+            
+            logoUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        logoPreview.src = event.target.result;
+                        logoPreview.style.display = 'block';
+                        customLogo = event.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Removed all logo dragging logic here as it's not needed for fixed position
+
+            // อัพโหลดลายเซ็น
+            const signatureUpload = document.getElementById('signatureUpload');
+            const signaturePreview = document.getElementById('signaturePreview');
+            
+            document.getElementById('signatureUploadArea').addEventListener('click', function() {
+                signatureUpload.click();
+            });
+            
+            signatureUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        signaturePreview.src = event.target.result;
+                        signaturePreview.style.display = 'block';
+                        signatureImage = event.target.result;
+                        // Clear canvas if an image is uploaded
+                        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // อัพโหลดพื้นหลัง
+            const bgUpload = document.getElementById('bgUpload');
+            const bgPreview = document.getElementById('bgPreview');
+            
+            document.getElementById('bgUploadArea').addEventListener('click', function() {
+                bgUpload.click();
+            });
+            
+            bgUpload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        bgPreview.src = event.target.result;
+                        bgPreview.style.display = 'block';
+                        customBackground = event.target.result;
+                        document.getElementById('transparentBg').checked = false; // Uncheck if new background is uploaded
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('transparentBg').addEventListener('change', function() {
+                if (this.checked) {
+                    customBackground = null; // Clear custom background if transparent is checked
+                    bgPreview.style.display = 'none';
+                    bgUpload.value = ''; // Clear file input
+                }
+            });
+            
+            // อัพเดทลายเซ็นจาก Pad
+            function updateSignaturePreview() {
+                const dataURL = canvas.toDataURL();
+                signaturePreview.src = dataURL;
+                signaturePreview.style.display = 'block';
+                signatureImage = dataURL;
+                // Clear any uploaded signature image if drawing
+                signatureUpload.value = '';
+            }
+            
+            // เปลี่ยนแนวกระดาษ
+            document.getElementById('portraitBtn').addEventListener('click', function() {
+                isLandscape = false;
+                document.getElementById('portraitBtn').classList.add('active');
+                document.getElementById('landscapeBtn').classList.remove('active');
+            });
+            
+            document.getElementById('landscapeBtn').addEventListener('click', function() {
+                isLandscape = true;
+                document.getElementById('landscapeBtn').classList.add('active');
+                document.getElementById('portraitBtn').classList.remove('active');
+            });
+            
+            // สร้างเกียรติบัตร
+            document.getElementById('generateBtn').addEventListener('click', generateCertificates);
+            
+            // ดาวน์โหลดทั้งหมด
+            document.getElementById('downloadAllBtn').addEventListener('click', downloadAllCertificates);
+            
+            // ล้างทั้งหมด
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                document.getElementById('certificateContainer').innerHTML = '';
+                document.getElementById('recipientNames').value = '';
+                document.getElementById('certTextLine1').value = 'ด้วยความยินดีอย่างยิ่ง';
+                document.getElementById('certTextLine2').value = 'มอบเกียรติบัตรนี้เพื่อเชิดชูเกียรติและประกาศคุณงามความดีของ';
+                document.getElementById('certTextLine3').value = 'ผู้ซึ่งได้ปฏิบัติหน้าที่ด้วยความวิริยะอุตสาหะเป็นอย่างยิ่ง';
+                
+                document.getElementById('logoPreview').style.display = 'none';
+                document.getElementById('bgPreview').style.display = 'none';
+                document.getElementById('signaturePreview').style.display = 'none';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                customBackground = null;
+                customLogo = null;
+                signatureImage = null;
+                logoUpload.value = '';
+                bgUpload.value = '';
+                signatureUpload.value = '';
+                document.getElementById('transparentBg').checked = false;
+                isLandscape = false;
+                document.getElementById('portraitBtn').classList.add('active');
+                document.getElementById('landscapeBtn').classList.remove('active');
+            });
+
+            // Function to adjust font sizes based on paper size
+            function adjustFontSizeForPaperSize(paperSizeKey, isLandscape) {
+                const sizes = paperSizes[paperSizeKey];
+                let baseDimension = isLandscape ? sizes.height : sizes.width; // Use shorter dimension as base for scaling
+                
+                // Base font sizes for A4 portrait (approximate)
+                const baseTitleSize = 36;
+                const baseTextSize = 20;
+                const baseRecipientNameSize = 48;
+                const baseSignerDetailSize = 18; // For signer name/title
+                const baseLogoMarginBottom = 15; // Base margin for logo
+
+                // Scale factor based on the base dimension (e.g., A4 width is 210mm)
+                // You might need to tweak the 210 value based on your preferred reference size
+                const referenceDimension = 210; 
+                const scale = baseDimension / referenceDimension;
+
+                return {
+                    title: `${Math.round(baseTitleSize * scale)}px`,
+                    text: `${Math.round(baseTextSize * scale)}px`,
+                    recipient: `${Math.round(baseRecipientNameSize * scale)}px`,
+                    signerDetail: `${Math.round(baseSignerDetailSize * scale)}px`,
+                    logoMarginBottom: `${Math.round(baseLogoMarginBottom * scale)}px` // Scale the margin below the logo
+                };
+            }
+            
+            function generateCertificates() {
+                const container = document.getElementById('certificateContainer');
+                container.innerHTML = '';
+                
+                const title = document.getElementById('certTitle').value;
+                const textLine1 = document.getElementById('certTextLine1').value;
+                const textLine2 = document.getElementById('certTextLine2').value;
+                const textLine3 = document.getElementById('certTextLine3').value;
+                const signerName = document.getElementById('signerName').value;
+                const signerTitle = document.getElementById('signerTitle').value;
+                const namesText = document.getElementById('recipientNames').value;
+                const fontFamily = document.getElementById('fontFamily').value;
+                const fontColor = document.getElementById('fontColor').value;
+                const paperSizeKey = document.getElementById('paperSize').value; 
+                const margin = document.getElementById('certMargin').value;
+                const transparentBg = document.getElementById('transparentBg').checked;
+                const logoWidthInput = parseInt(document.getElementById('logoWidth').value);
+                const logoHeightInput = parseInt(document.getElementById('logoHeight').value);
+                
+                const names = namesText.split('\n').filter(name => name.trim() !== '');
+                
+                if (names.length === 0) {
+                    alert('กรุณาป้อนชื่อผู้รับอย่างน้อยหนึ่งชื่อ');
+                    return;
+                }
+                
+                // กำหนดขนาดกระดาษ
+                let widthMM = paperSizes[paperSizeKey].width;
+                let heightMM = paperSizes[paperSizeKey].height;
+                
+                // ถ้าเป็นแนวนอน ให้สลับขนาด
+                if (isLandscape) {
+                    [widthMM, heightMM] = [heightMM, widthMM];
+                }
+                
+                const marginPX = parseInt(margin) * 3.78; // Convert margin from mm to px
+                
+                // แปลงมิลลิเมตรเป็นพิกเซล (1mm ≈ 3.78px)
+                const pxPerMm = 3.78; 
+                const widthPX = widthMM * pxPerMm;
+                const heightPX = heightMM * pxPerMm;
+
+                const adjustedFontSizes = adjustFontSizeForPaperSize(paperSizeKey, isLandscape);
+
+                names.forEach((name, index) => {
+                    const cert = document.createElement('div');
+                    cert.className = 'certificate';
+                    cert.id = `certificate-${index}`;
+                    
+                    // ตั้งค่าขนาด
+                    cert.style.width = `${widthPX}px`;
+                    cert.style.height = `${heightPX}px`;
+                    cert.style.padding = `${marginPX}px`; 
+                    
+                    // ตั้งค่าพื้นหลัง
+                    if (transparentBg) {
+                        cert.classList.add('no-background');
+                        cert.style.backgroundColor = 'transparent'; 
+                    } else if (customBackground) {
+                        cert.style.backgroundImage = `url('${customBackground}')`;
+                        cert.classList.remove('no-background');
+                        cert.style.backgroundColor = 'transparent'; 
+                    } else {
+                        cert.classList.remove('no-background');
+                        cert.style.backgroundColor = '#fff9e6'; 
+                    }
+                    
+                    // สร้างเนื้อหาเกียรติบัตร
+                    let logoHTML = '';
+                    if (customLogo) {
+                        // Calculate available width for logo based on certificate width
+                        // Subtract margin twice (left and right) to get content width
+                        const availableContentWidth = widthPX - (2 * marginPX); 
+                        const availableContentHeight = heightPX - (2 * marginPX); // This is approximate, header height is dynamic
+
+                        // Ensure logo doesn't exceed user-defined dimensions or available space
+                        let finalLogoWidth = logoWidthInput; 
+                        let finalLogoHeight = logoHeightInput; 
+
+                        // Prioritize fitting within the available content width (e.g., 80% of content width)
+                        // This makes sure the logo is not too wide
+                        const maxAllowedLogoWidth = availableContentWidth * 0.8;
+                        if (finalLogoWidth > maxAllowedLogoWidth) {
+                            finalLogoHeight = (finalLogoHeight / finalLogoWidth) * maxAllowedLogoWidth;
+                            finalLogoWidth = maxAllowedLogoWidth;
+                        }
+
+                        // Also ensure it doesn't take too much vertical space (e.g., 25% of content height)
+                        const maxAllowedLogoHeight = availableContentHeight * 0.25; 
+                        if (finalLogoHeight > maxAllowedLogoHeight) {
+                            finalLogoWidth = (finalLogoWidth / finalLogoHeight) * maxAllowedLogoHeight;
+                            finalLogoHeight = maxAllowedLogoHeight;
+                        }
+
+                        // Apply the calculated dimensions
+                        logoHTML = `<img src="${customLogo}" class="logo-image" style="width: ${finalLogoWidth}px; height: ${finalLogoHeight}px; margin-bottom: ${adjustedFontSizes.logoMarginBottom};" alt="โลโก้">`;
+                    }
+                    
+                    let signatureHTML = '';
+                    if (signatureImage) {
+                        signatureHTML = `<img src="${signatureImage}" class="signature-image" alt="ลายเซ็น">`;
+                    } else {
+                        signatureHTML = `<div class="signature-line"></div>`;
+                    }
+                    
+                    cert.innerHTML = `
+                        <div class="certificate-content" style="font-family: ${fontFamily}; color: ${fontColor};">
+                            <div class="certificate-header">
+                                ${logoHTML}
+                                <div class="certificate-title" style="font-size: ${adjustedFontSizes.title};">${title}</div>
+                            </div>
+                            <div class="certificate-text-block">
+                                <div class="certificate-text-line" style="font-size: ${adjustedFontSizes.text};">${textLine1}</div>
+                                <div class="certificate-text-line" style="font-size: ${adjustedFontSizes.text};">${textLine2}</div>
+                                <div class="certificate-text-line" style="font-size: ${adjustedFontSizes.text};">${textLine3}</div>
+                            </div>
+                            <div class="recipient-name" style="font-size: ${adjustedFontSizes.recipient};">${name}</div>
+                            <div class="signature-area">
+                                <div class="signature">
+                                    ${signatureHTML}
+                                    <div style="font-size: ${adjustedFontSizes.signerDetail};">${signerName}</div>
+                                    <div style="font-size: ${adjustedFontSizes.signerDetail};">${signerTitle}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="download-btn" onclick="downloadCertificate('certificate-${index}')" style="position: absolute; bottom: 10px; right: 10px;">ดาวน์โหลด</button>
+                    `;
+                    
+                    container.appendChild(cert);
+                });
+            }
+            
+            function downloadAllCertificates() {
+                const certificates = document.querySelectorAll('.certificate');
+                if (certificates.length === 0) {
+                    alert('กรุณาสร้างเกียรติบัตรก่อน');
+                    return;
+                }
+                
+                // Using a Promise.all to ensure all canvases are rendered before triggering downloads
+                const downloadPromises = Array.from(certificates).map((cert, index) => {
+                    return new Promise(resolve => {
+                        // Small delay to ensure browser handles rendering each canvas properly
+                        setTimeout(() => {
+                            downloadCertificate(cert.id);
+                            resolve();
+                        }, index * 500); 
+                    });
+                });
+
+                Promise.all(downloadPromises).then(() => {
+                    console.log('All certificates downloaded.');
+                });
+            }
+        });
+        
+        // ฟังก์ชันดาวน์โหลด (ต้องเป็น global)
+        function downloadCertificate(elementId) {
+            const element = document.getElementById(elementId);
+            
+            // ตั้งค่าความละเอียดสำหรับการพิมพ์
+            const options = {
+                scale: 3, // เพิ่มความละเอียด
+                logging: false,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null 
+            };
+            
+            html2canvas(element, options).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `เกียรติบัตร-${elementId}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
