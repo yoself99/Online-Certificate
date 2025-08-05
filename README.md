@@ -1,1 +1,1 @@
-[kk](https://yoself99.github.io/Online-Certificate/)
+https://yoself99.github.io/Online-Certificate/
